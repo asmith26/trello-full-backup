@@ -13,7 +13,7 @@ import json
 ATTACHMENT_BYTE_LIMIT = 100000000
 ATTACHMENT_REQUEST_TIMEOUT = 30  # 30 seconds
 ATTACHMENT_DOWNLOAD_RETRIES = 3  # Retry 3 times at most
-FILE_NAME_MAX_LENGTH = 25
+FILE_NAME_MAX_LENGTH = 100
 FILTERS = ['open', 'all']
 
 TRELLO_API = 'https://api.trello.com/1/'
@@ -86,7 +86,7 @@ print()
 
 def sanitize_file_name(name):
     """ Stip problematic characters for a file name """
-    return re.sub(r'[<>:\/\|\?\*]', '_', name)[-FILE_NAME_MAX_LENGTH:]
+    return re.sub(r'[<>:\/\|\?\*]', '_', name)[:FILE_NAME_MAX_LENGTH]
 
 
 def write_file(file_name, obj, dumps=True):
