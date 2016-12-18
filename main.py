@@ -13,7 +13,7 @@ import json
 ATTACHMENT_BYTE_LIMIT = 100000000
 ATTACHMENT_REQUEST_TIMEOUT = 30  # 30 seconds
 ATTACHMENT_DOWNLOAD_RETRIES = 3  # Retry 3 times at most
-FILE_NAME_MAX_LENGTH = 255
+FILE_NAME_MAX_LENGTH = 25
 FILTERS = ['open', 'all']
 
 TRELLO_API = 'https://api.trello.com/1/'
@@ -35,19 +35,11 @@ parser.add_argument('-d',
                     nargs='?',
                     help='Destination folder')
 
-# Backup the boards that are closed
-parser.add_argument('-B', '--closed-boards',
-                    dest='closed_boards',
-                    action='store_const',
-                    default=0,
-                    const=1,
-                    help='Backup closed board')
-
 # Backup the lists that are archived
 parser.add_argument('-L', '--archived-lists',
                     dest='archived_lists',
                     action='store_const',
-                    default=0,
+                    default=1,
                     const=1,
                     help='Backup archived lists')
 
@@ -55,17 +47,9 @@ parser.add_argument('-L', '--archived-lists',
 parser.add_argument('-C', '--archived-cards',
                     dest='archived_cards',
                     action='store_const',
-                    default=0,
+                    default=1,
                     const=1,
                     help='Backup archived cards')
-
-# Backup the cards that are archived
-parser.add_argument('-o', '--organizations',
-                    dest='orgs',
-                    action='store_const',
-                    default=False,
-                    const=True,
-                    help='Backup organizations')
 
 # Set the size limit for the attachments
 parser.add_argument('-a', '--attachment-size',
@@ -93,7 +77,6 @@ os.chdir(dest_dir)
 
 print('==== Backup initiated')
 print('Backing up to:', dest_dir)
-print('Backup closed board:', bool(args.closed_boards))
 print('Backup archived lists:', bool(args.archived_lists))
 print('Backup archived cards:', bool(args.archived_cards))
 print('Attachment size limit (bytes):', args.attachment_size)
@@ -111,11 +94,6 @@ def write_file(file_name, obj, dumps=True):
     with open(file_name, 'w', encoding='utf-8') as f:
         to_write = json.dumps(obj, indent=4, sort_keys=True) if dumps else obj
         f.write(to_write)
-
-
-def filter_boards(boards):
-    """ Return a list of the boards to retrieve (closed or not) """
-    return [b for b in boards if not b['closed'] or args.closed_boards]
 
 
 def download_attachments(c):
@@ -223,28 +201,13 @@ def backup_board(board):
         # Exit list directory
         os.chdir('..')
 
-    # Exit sub directory
+    # Exit board directory
     os.chdir('..')
-
-org_boards_data = {}
 
 my_boards_url = TRELLO_API + 'members/me/boards' + auth
-org_boards_data['me'] = requests.get(my_boards_url).json()
+my_boards_data = requests.get(my_boards_url).json()
 
-orgs = []
-if args.orgs:
-    orgs = requests.get(TRELLO_API + 'members/me/organizations' + auth).json()
-
-for org in orgs:
-    boards_url = TRELLO_API + 'organizations/' + org['id'] + '/boards' + auth
-    org_boards_data[org['name']] = requests.get(boards_url).json()
-
-for org, boards in org_boards_data.items():
-    os.mkdir(org)
-    os.chdir(org)
-    boards = filter_boards(boards)
-    for board in boards:
-        backup_board(board)
-    os.chdir('..')
+for board in my_boards_data:
+    backup_board(board)
 
 print('Trello Full Backup Completed!')
