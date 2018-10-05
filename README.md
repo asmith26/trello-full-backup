@@ -49,6 +49,7 @@ Make sure the environment variables **TRELLO_API_KEY** and **TRELLO_TOKEN** are 
 - To get the API key: [https://trello.com/app-key](https://trello.com/app-key)
 - To get the token: [https://trello.com/1/authorize?scope=read&expiration=never&name=backup&key=REPLACE_WITH_YOUR_API_KEY&response_type=token](https://trello.com/1/authorize?scope=read&expiration=never&name=backup&key=REPLACE_WITH_YOUR_API_KEY&response_type=token)
 
+View and revoke tokens at [https://trello.com/{username}/account](https://developers.trello.com/page/authorization#section-revoking-tokens)
 
 Then you can run the following commands:
 ```
