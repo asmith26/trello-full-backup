@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import sys
 import itertools
 import os
@@ -19,8 +17,8 @@ FILTERS = ['open', 'all']
 TRELLO_API = 'https://api.trello.com/1/'
 
 # Read the API keys from the environment variables
-TRELLO_API_KEY = os.getenv('TRELLO_API_KEY', '')
-TRELLO_TOKEN = os.getenv('TRELLO_TOKEN', '')
+TRELLO_API_KEY = os.environ['TRELLO_API_KEY']
+TRELLO_TOKEN = os.environ['TRELLO_TOKEN']
 
 auth = '?key=' + TRELLO_API_KEY + '&token=' + TRELLO_TOKEN
 
